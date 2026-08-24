@@ -5,32 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115學年度 課後社團報名系統</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Fredoka:wght@500;600;700&display=swap');
+        /* 引入 Noto Sans TC 與其他字型 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=ZCOOL+KuaiLe&family=Fredoka:wght@500;600;700&display=swap');
 
         :root {
-            /* 保留原變數名稱以維持 JS 相容性，替換為活潑童趣色調 */
-            --primary-green: #2FBF71;   /* 草地綠 - 強調色 */
-            --header-green: #1D9E63;    /* 標題綠 */
-            --light-bg: #FFF4CC;        /* 陽光黃 - 卡片底色 */
-            --card-bg: #FFFDF6;         /* 奶油白 */
-            --text-dark: #3A3A3A;
-            --text-grey: #8A8D8F;
-            --white: #ffffff;
-            --border-color: #FFD9A0;    /* 蜜桃橘 */
-            --btn-cancel: #FFE3DC;      /* 粉橘 */
+            var(--primary-green): #2FBF71;   
+            var(--header-green): #1D9E63;    
+            var(--light-bg): #FFF4CC;        
+            var(--card-bg): #FFFDF6;         
+            var(--text-dark): #3A3A3A;
+            var(--text-grey): #8A8D8F;
+            var(--white): #ffffff;
+            var(--border-color): #FFD9A0;    
+            var(--btn-cancel): #FFE3DC;      
 
-            /* 新增：童趣調色盤 */
-            --sky: #5EC6F2;
-            --sun: #FFD34D;
-            --coral: #FF6F5E;
-            --grape: #B57EE8;
-            --grass: #67D28D;
+            var(--sky): #5EC6F2;
+            var(--sun): #FFD34D;
+            var(--coral): #FF6F5E;
+            var(--grape): #B57EE8;
+            var(--grass): #67D28D;
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Fredoka', 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
+            /* 將 Noto Sans TC 設為主要字型 */
+            font-family: 'Noto Sans TC', 'Fredoka', 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
             background:
                 radial-gradient(circle at 15% 8%, rgba(255,255,255,0.9) 0 26px, transparent 27px),
                 radial-gradient(circle at 30% 5%, rgba(255,255,255,0.75) 0 18px, transparent 19px),
@@ -89,14 +89,14 @@
             display: inline-block;
         }
         .header-card h1 {
-            font-family: 'ZCOOL KuaiLe', 'Fredoka', '微軟正黑體', sans-serif;
+            font-family: 'ZCOOL KuaiLe', 'Fredoka', 'Noto Sans TC', sans-serif;
             color: var(--header-green);
             font-size: 23px;
             letter-spacing: 1px;
             margin: 5px 0 0 0;
         }
         .header-card p {
-            font-family: 'ZCOOL KuaiLe', 'Fredoka', '微軟正黑體', sans-serif;
+            font-family: 'ZCOOL KuaiLe', 'Fredoka', 'Noto Sans TC', sans-serif;
             color: var(--coral);
             font-size: 18px;
             margin: 6px 0 16px 0;
@@ -195,7 +195,7 @@
             margin-right: 4px;
         }
         .section-title {
-            font-family: 'ZCOOL KuaiLe', '微軟正黑體', sans-serif;
+            font-family: 'ZCOOL KuaiLe', 'Noto Sans TC', sans-serif;
             font-size: 19px;
             font-weight: normal;
             color: var(--text-dark);
@@ -416,7 +416,7 @@
         <div class="step-line"></div>
         <div class="step-indicator" id="indicator3">
             <div class="step-circle">🎒</div>
-            <span>報名</span>
+            <span>排志願</span>
         </div>
     </div>
 
