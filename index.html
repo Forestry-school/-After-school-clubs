@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>115學年度 課後社團報名系統</title>
+    <style>
+        /* 龍貓森林風格配色 */
+        :root {
+            --primary-green: #5c7a52; /* 森林深綠 */
+            --light-green: #89a87d;   /* 樹葉淺綠 */
+            --totoro-grey: #8a8d8f;   /* 龍貓灰 */
+            --bg-color: #f4f7f4;      /* 米白背景 */
+            --text-dark: #333333;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: var(--white);
+            max-width: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 30px;
+            border: 2px solid var(--light-green);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px dashed var(--light-green);
+            padding-bottom: 15px;
+        }
+        .header img {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            color: var(--primary-green);
+            font-size: 22px;
+            margin: 5px 0;
+        }
+        .step-container {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .step-container.active {
+            display: block;
+        }
+        h2 {
+            color: var(--totoro-grey);
+            font-size: 18px;
+            text-align: center;
+        }
+        .grid-btn {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button, .btn {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        button:hover, .btn:hover {
+            background-color: var(--light-green);
+            transform: translateY(-2px);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light-green);
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .club-card {
+            border: 1px solid var(--light-green);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fafdfa;
+        }
+        .club-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary-green);
+        }
+        #loading {
+            text-align: center;
+            color: var(--totoro-grey);
+            font-weight: bold;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="Logo.jpg" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=LOGO'">
+        <h1>福瑞斯特中小學</h1>
+        <h2>115學年度 第一學期 課後社團選社</h2>
+    </div>
+
+    <div id="loading">系統資料載入中，請稍候...</div>
+
+    <!-- Step 1: 選班級 -->
+    <div id="step1" class="step-container">
+        <h2>1. 請選擇班級</h2>
+        <div class="grid-btn" id="classList"></div>
+    </div>
+
+    <!-- Step 2 & 3: 點名字與輸入密碼 -->
+    <div id="step2" class="step-container">
+        <h2>2. 選擇姓名與驗證密碼</h2>
+        <div class="form-group">
+            <label>選擇學生：</label>
+            <select id="studentSelect">
+                <option value="">請選擇...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>驗證密碼 (password)：</label>
+            <input type="password" id="studentPwd" placeholder="請輸入密碼">
+        </div>
+        <button onclick="goToStep3()" style="width: 100%;">下一步</button>
+        <button onclick="showStep('step1')" style="width: 100%; margin-top: 10px; background-color: var(--totoro-grey);">上一步</button>
+    </div>
+
+    <!-- Step 4 & 5: 報名課後與送出 -->
+    <div id="step3" class="step-container">
+        <h2>3. 選擇課後社團</h2>
+        <div id="clubList"></div>
+        <button onclick="submitForm()" style="width: 100%; margin-top: 20px;">確認送出 (可再次修改)</button>
+        <button onclick="showStep('step2')" style="width: 100%; margin-top: 10px; background-color: var(--totoro-grey);">上一步</button>
+    </div>
+
+    <!-- 完成畫面 -->
+    <div id="step-success" class="step-container" style="text-align: center;">
+        <h2 style="color: var(--primary-green);">報名資料已送出！</h2>
+        <p>若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
+        <button onclick="location.reload()" style="margin-top: 20px;">回首頁</button>
+    </div>
+</div>
+
+<script>
+    // =========== 請將下方 URL 替換為您的 Apps Script 網頁應用程式網址 ===========
+    const API_URL = "https://script.google.com/macros/s/AKfycbxk2YLVQFU6SGPMk-gsjlvA7gbSOhybLWH5dhmdCmArGAp4_MsByIMS2hM9NNIKcUXtGg/exec"; 
+    
+    let globalData = {};
+    let currentClass = "";
+    let currentStudent = null;
+
+    // 初始化抓取資料
+    fetch(API_URL + "?action=getInitialData")
+        .then(res => res.json())
+        .then(data => {
+            globalData = data;
+            document.getElementById('loading').style.display = 'none';
+            renderClasses();
+            showStep('step1');
+        })
+        .catch(err => {
+            document.getElementById('loading').innerText = "資料載入失敗，請確認網路連線。";
+            console.error(err);
+        });
+
+    function showStep(stepId) {
+        document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+        document.getElementById(stepId).classList.add('active');
+    }
+
+    // 渲染班級按鈕
+    function renderClasses() {
+        const classContainer = document.getElementById('classList');
+        const classes = Object.keys(globalData.students).sort();
+        
+        classes.forEach(cls => {
+            const btn = document.createElement('button');
+            btn.innerText = cls;
+            btn.onclick = () => selectClass(cls);
+            classContainer.appendChild(btn);
+        });
+    }
+
+    // 選擇班級
+    function selectClass(cls) {
+        currentClass = cls;
+        const studentSelect = document.getElementById('studentSelect');
+        studentSelect.innerHTML = '<option value="">請選擇...</option>';
+        
+        globalData.students[cls].forEach(student => {
+            const opt = document.createElement('option');
+            opt.value = JSON.stringify(student);
+            opt.innerText = `${student.num}號 - ${student.name}`;
+            studentSelect.appendChild(opt);
+        });
+        
+        document.getElementById('studentPwd').value = '';
+        showStep('step2');
+    }
+
+    // 前往選社團
+    function goToStep3() {
+        const studentVal = document.getElementById('studentSelect').value;
+        const pwd = document.getElementById('studentPwd').value;
+        
+        if (!studentVal) return alert("請選擇姓名！");
+        if (!pwd) return alert("請輸入密碼！");
+        
+        currentStudent = JSON.parse(studentVal);
+        
+        // 渲染符合該學生年級的社團
+        renderClubs(currentStudent.grade);
+        showStep('step3');
+    }
+
+    // 渲染社團列表
+    function renderClubs(studentGrade) {
+        const clubContainer = document.getElementById('clubList');
+        clubContainer.innerHTML = '';
+        
+        let availableClubs = globalData.clubs.filter(club => club.target.includes(studentGrade));
+        
+        if (availableClubs.length === 0) {
+            clubContainer.innerHTML = '<p>目前沒有適合您年級的社團。</p>';
+            return;
+        }
+
+        availableClubs.forEach((club, index) => {
+            const div = document.createElement('div');
+            div.className = 'club-card';
+            div.innerHTML = `
+                <label style="cursor:pointer; display:flex; align-items:center;">
+                    <input type="radio" name="clubChoice" value="${club.name}" style="width:20px; height:20px; margin-right:15px;">
+                    <div>
+                        <h3>${club.name}</h3>
+                        <p style="margin:5px 0; font-size:14px; color:#555;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
+                        <p style="margin:0; font-size:13px; color:#777;">${club.desc}</p>
+                    </div>
+                </label>
+            `;
+            clubContainer.appendChild(div);
+        });
+    }
+
+    // 最終送出
+    function submitForm() {
+        const selectedClub = document.querySelector('input[name="clubChoice"]:checked');
+        if (!selectedClub) return alert("請選擇一個社團！");
+        const pwd = document.getElementById('studentPwd').value;
+
+        const payload = {
+            cls: currentClass,
+            num: currentStudent.num,
+            name: currentStudent.name,
+            pwd: pwd,
+            selectedClubs: selectedClub.value
+        };
+
+        // 顯示載入中
+        document.getElementById('step3').innerHTML = '<h2>資料傳送中，請稍候...</h2>';
+
+        fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showStep('step-success');
+            } else {
+                alert(data.message); // 可能是密碼錯誤
+                location.reload();
+            }
+        })
+        .catch(err => {
+            alert("系統發生錯誤，請稍後再試。");
+            console.error(err);
+        });
+    }
+</script>
+
+</body>
+</html>
