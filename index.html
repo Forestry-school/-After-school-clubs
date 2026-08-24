@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115學年度 課後社團報名系統</title>
     <style>
-        /* 參照第二張圖的質感配色 */
+        /* 質感配色設定 */
         :root {
             --primary-green: #2c5a3d; /* 深綠色標題/按鈕 */
             --light-bg: #eef2ed;      /* 頂部區塊淺綠背景 */
@@ -253,12 +253,11 @@
 <div class="container">
     <!-- 頂部資訊卡片 -->
     <div class="header-card">
-        <!-- 若有真實Logo網址可替換 src -->
         <img src="Logo.jpg" alt="Logo" onerror="this.src='https://via.placeholder.com/200x50?text=福瑞斯特中小學Logo'">
         <h1>115學年度 第一學期</h1>
         <p>線上選社志願序</p>
         <div class="timer-box">
-            <span class="icon">🚫</span>報名已截止<br>
+            <span class="icon">🚫</span>報名尚未開始<br>
             <span style="font-family: monospace; font-size: 16px;">00天 00時 00分 00秒</span>
         </div>
     </div>
@@ -311,11 +310,11 @@
         </div>
     </div>
 
-    <!-- Step 3: 排志願 -->
+    <!-- Step 3: 排志願 (多選) -->
     <div id="step3" class="step-content">
         <div class="section-header">
             <button class="btn-back" onclick="showStep(2)">上一頁</button>
-            <h2 class="section-title">選擇課後社團</h2>
+            <h2 class="section-title">請選擇課後社團 (可多選)</h2>
         </div>
         <div id="clubList"></div>
         <button class="btn-primary" style="margin-top: 15px;" onclick="submitForm()">確認送出 (可再次修改)</button>
@@ -330,6 +329,7 @@
 </div>
 
 <script>
+    // =========== 請將下方 URL 替換為您的 Apps Script 網頁應用程式網址 ===========
     const API_URL = "https://script.google.com/macros/s/AKfycbxk2YLVQFU6SGPMk-gsjlvA7gbSOhybLWH5dhmdCmArGAp4_MsByIMS2hM9NNIKcUXtGg/exec"; 
     
     let globalData = {};
@@ -433,7 +433,7 @@
         showStep(3);
     }
 
-    // Step 3: 渲染社團列表
+    // Step 3: 渲染社團列表 (改為 Checkbox 多選)
     function renderClubs(studentGrade) {
         const clubContainer = document.getElementById('clubList');
         clubContainer.innerHTML = '';
@@ -450,7 +450,7 @@
             div.className = 'club-card';
             div.innerHTML = `
                 <label style="cursor:pointer; display:flex; align-items:flex-start;">
-                    <input type="radio" name="clubChoice" value="${club.name}" style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
+                    <input type="checkbox" name="clubChoice" value="${club.name}" style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
                     <div>
                         <h3 style="margin: 0 0 5px 0; color: var(--primary-green); font-size: 16px;">${club.name}</h3>
                         <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
@@ -462,10 +462,12 @@
         });
     }
 
-    // 最終送出
+    // 最終送出 (收集 Checkbox 陣列)
     function submitForm() {
-        const selectedClub = document.querySelector('input[name="clubChoice"]:checked');
-        if (!selectedClub) return alert("請選擇一個社團！");
+        const selectedCheckboxes = document.querySelectorAll('input[name="clubChoice"]:checked');
+        if (selectedCheckboxes.length === 0) return alert("請至少選擇一個社團！");
+        
+        const selectedClubsArray = Array.from(selectedCheckboxes).map(cb => cb.value);
         const pwd = document.getElementById('studentPwd').value;
 
         const payload = {
@@ -473,7 +475,7 @@
             num: currentStudent.num,
             name: currentStudent.name,
             pwd: pwd,
-            selectedClubs: selectedClub.value
+            selectedClubs: selectedClubsArray
         };
 
         document.getElementById('step3').innerHTML = '<h2 style="text-align:center; color:var(--text-grey);">資料傳送中，請稍候...</h2>';
@@ -488,7 +490,7 @@
                 document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
                 document.getElementById('step-success').classList.add('active');
             } else {
-                alert(data.message); // 可能是密碼錯誤
+                alert(data.message); 
                 location.reload();
             }
         })
