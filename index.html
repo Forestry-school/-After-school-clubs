@@ -5,32 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115學年度 課後社團報名系統</title>
     <style>
-        /* 引入 Noto Sans TC 與其他字型 */
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=ZCOOL+KuaiLe&family=Fredoka:wght@500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
 
         :root {
-            var(--primary-green): #2FBF71;   
-            var(--header-green): #1D9E63;    
-            var(--light-bg): #FFF4CC;        
-            var(--card-bg): #FFFDF6;         
-            var(--text-dark): #3A3A3A;
-            var(--text-grey): #8A8D8F;
-            var(--white): #ffffff;
-            var(--border-color): #FFD9A0;    
-            var(--btn-cancel): #FFE3DC;      
+            /* 保留原變數名稱以維持 JS 相容性，替換為活潑童趣色調 */
+            --primary-green: #2FBF71;   /* 草地綠 - 強調色 */
+            --header-green: #1D9E63;    /* 標題綠 */
+            --light-bg: #FFF4CC;        /* 陽光黃 - 卡片底色 */
+            --card-bg: #FFFDF6;         /* 奶油白 */
+            --text-dark: #3A3A3A;
+            --text-grey: #8A8D8F;
+            --white: #ffffff;
+            --border-color: #FFD9A0;    /* 蜜桃橘 */
+            --btn-cancel: #FFE3DC;      /* 粉橘 */
 
-            var(--sky): #5EC6F2;
-            var(--sun): #FFD34D;
-            var(--coral): #FF6F5E;
-            var(--grape): #B57EE8;
-            var(--grass): #67D28D;
+            /* 新增：童趣調色盤 */
+            --sky: #5EC6F2;
+            --sun: #FFD34D;
+            --coral: #FF6F5E;
+            --grape: #B57EE8;
+            --grass: #67D28D;
         }
 
         * { box-sizing: border-box; }
 
         body {
-            /* 將 Noto Sans TC 設為主要字型 */
-            font-family: 'Noto Sans TC', 'Fredoka', 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
+            font-family: 'Noto Sans TC', 'Helvetica Neue', Arial, sans-serif;
             background:
                 radial-gradient(circle at 15% 8%, rgba(255,255,255,0.9) 0 26px, transparent 27px),
                 radial-gradient(circle at 30% 5%, rgba(255,255,255,0.75) 0 18px, transparent 19px),
@@ -89,25 +89,25 @@
             display: inline-block;
         }
         .header-card h1 {
-            font-family: 'ZCOOL KuaiLe', 'Fredoka', 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
             color: var(--header-green);
-            font-size: 23px;
+            font-size: 27px;
             letter-spacing: 1px;
             margin: 5px 0 0 0;
         }
         .header-card p {
-            font-family: 'ZCOOL KuaiLe', 'Fredoka', 'Noto Sans TC', sans-serif;
+            font-family: 'Noto Sans TC', sans-serif;
             color: var(--coral);
-            font-size: 18px;
+            font-size: 21px;
             margin: 6px 0 16px 0;
-            font-weight: normal;
+            font-weight: 700;
         }
         .timer-box {
             background-color: #3A3550;
             color: white;
             border-radius: 16px;
-            padding: 12px 10px;
-            font-size: 14px;
+            padding: 13px 10px;
+            font-size: 17px;
             font-weight: 600;
             line-height: 1.6;
             box-shadow: inset 0 -3px 0 rgba(0,0,0,0.25);
@@ -127,10 +127,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-grey);
             font-weight: 700;
-            width: 68px;
+            width: 74px;
         }
         .step-indicator.active { color: var(--header-green); }
         .step-circle {
@@ -144,8 +144,8 @@
             align-items: center;
             margin-bottom: 6px;
             color: #b9bdb9;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 17px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 20px;
             font-weight: 700;
             box-shadow: 0 3px 0 #DCE3DC;
             transition: all 0.25s;
@@ -182,7 +182,7 @@
             color: #0d7bb0;
             padding: 6px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
@@ -195,9 +195,9 @@
             margin-right: 4px;
         }
         .section-title {
-            font-family: 'ZCOOL KuaiLe', 'Noto Sans TC', sans-serif;
-            font-size: 19px;
-            font-weight: normal;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
             color: var(--text-dark);
             margin: 0;
         }
@@ -227,19 +227,20 @@
             box-shadow: 0 1px 0 var(--border-color);
         }
         .student-card .num {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 12px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 14px;
             color: var(--text-grey);
             margin-bottom: 5px;
         }
         .student-card .name {
-            font-size: 21px;
+            font-size: 24px;
             font-weight: bold;
             color: var(--text-dark);
         }
         .class-btn {
-            font-family: 'ZCOOL KuaiLe', sans-serif;
-            font-size: 19px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
         }
         .class-btn:nth-child(6n+1) { border-color: #FFCFC7; box-shadow: 0 4px 0 #FFCFC7; }
         .class-btn:nth-child(6n+1):hover { box-shadow: 0 6px 0 var(--coral); border-color: var(--coral); }
@@ -274,8 +275,9 @@
             border: none;
             padding: 16px;
             border-radius: 16px;
-            font-family: 'ZCOOL KuaiLe', sans-serif;
-            font-size: 18px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
             cursor: pointer;
             width: 100%;
             margin-top: 15px;
@@ -306,19 +308,20 @@
             animation: popIn 0.3s ease;
         }
         .modal-card h3 {
-            font-family: 'ZCOOL KuaiLe', sans-serif;
-            font-size: 22px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 25px;
+            font-weight: 900;
             margin: 0 0 5px 0;
             color: var(--text-dark);
         }
         .modal-card .student-badge {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: var(--primary-green);
             margin-bottom: 15px;
         }
         .modal-card .desc {
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text-grey);
             margin-bottom: 15px;
         }
@@ -327,8 +330,8 @@
             padding: 12px;
             border: 3px solid var(--primary-green);
             border-radius: 14px;
-            font-size: 20px;
-            font-family: 'Fredoka', sans-serif;
+            font-size: 22px;
+            font-family: 'Noto Sans TC', sans-serif;
             text-align: center;
             outline: none;
             margin-bottom: 25px;
@@ -342,7 +345,7 @@
             flex: 1;
             padding: 12px 0;
             border-radius: 14px;
-            font-size: 15px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
             border: none;
@@ -362,6 +365,7 @@
             text-align: center;
             color: var(--text-grey);
             font-weight: bold;
+            font-size: 16px;
             margin-bottom: 20px;
         }
 
@@ -398,7 +402,7 @@
         
         <div class="timer-box" id="timerBox">
             <span class="icon" id="timerIcon">⏳</span> <span id="timerStatus">載入時間中...</span><br>
-            <span id="timerDisplay" style="font-family: 'Fredoka', monospace; font-size: 16px;">--天 --時 --分 --秒</span>
+            <span id="timerDisplay" style="font-family: 'Noto Sans TC', monospace; font-size: 18px;">--天 --時 --分 --秒</span>
         </div>
     </div>
 
@@ -449,8 +453,8 @@
 
     <div id="step-success" class="step-content" style="text-align: center; padding: 30px 0;">
         <div style="font-size: 52px; margin-bottom: 6px;">🎉</div>
-        <h2 style="font-family: 'ZCOOL KuaiLe', sans-serif; font-weight: normal; color: var(--header-green);">報名資料已送出！</h2>
-        <p style="color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
+        <h2 style="font-family: 'Noto Sans TC', sans-serif; font-weight: 900; font-size: 24px; color: var(--header-green);">報名資料已送出！</h2>
+        <p style="font-size: 16px; color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
         <button class="btn-submit" onclick="location.reload()">🏠 回首頁</button>
     </div>
 </div>
@@ -495,7 +499,7 @@
             } catch (err) {
                 document.getElementById('loading').innerHTML = `
                     <div style='color:red; margin-bottom:10px;'>⚠️ 讀取資料失敗！</div>
-                    <div style='font-size:14px; color:#555;'>請確認您的 Apps Script 是否有按「<b>建立新版本部署</b>」。</div>
+                    <div style='font-size:16px; color:#555;'>請確認您的 Apps Script 是否有按「<b>建立新版本部署</b>」。</div>
                 `;
             }
         })
@@ -659,9 +663,9 @@
                 <label style="cursor:pointer; display:flex; align-items:flex-start;">
                     <input type="checkbox" name="clubChoice" value="${club.name}" data-day="${club.day}" ${isChecked} style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
                     <div>
-                        <h3 style="margin: 0 0 5px 0; color: var(--header-green); font-size: 16px;">${club.name}</h3>
-                        <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
-                        <p style="margin: 0; font-size: 12px; color: #888;">${club.desc}</p>
+                        <h3 style="margin: 0 0 5px 0; color: var(--header-green); font-size: 18px;">${club.name}</h3>
+                        <p style="margin: 0 0 5px 0; font-size: 15px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
+                        <p style="margin: 0; font-size: 14px; color: #888;">${club.desc}</p>
                     </div>
                 </label>
             `;
