@@ -36,7 +36,6 @@
             position: relative;
         }
 
-        /* 頂部資訊卡片 */
         .header-card {
             background-color: var(--light-bg);
             border-radius: 15px;
@@ -72,7 +71,6 @@
         .timer-box .icon { color: #ff4d4d; margin-right: 5px; }
         .timer-box.active-timer .icon { color: #0d8253; } 
 
-        /* 進度條 */
         .progress-bar {
             display: flex;
             justify-content: center;
@@ -113,11 +111,9 @@
             transform: translateY(-10px);
         }
 
-        /* 內容區塊 */
         .step-content { display: none; animation: fadeIn 0.4s ease; }
         .step-content.active { display: block; }
 
-        /* 返回按鈕與標題 */
         .section-header {
             display: flex;
             align-items: center;
@@ -150,7 +146,6 @@
             margin: 0;
         }
 
-        /* 卡片網格 */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -181,7 +176,6 @@
             font-weight: bold;
         }
 
-        /* 社團清單卡片 */
         .club-card {
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -205,7 +199,6 @@
             margin-top: 15px;
         }
 
-        /* 彈跳視窗 (Modal) 樣式 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -291,7 +284,7 @@
 
 <div class="container">
     <div class="header-card">
-        <img src="logo.jpg" alt="Logo" onerror="this.style.display='none';">
+        <img src="logo.png" alt="Logo" onerror="this.style.display='none';">
         <h1>115學年度 第一學期</h1>
         <p>課後社團 報名系統</p>
         
@@ -358,7 +351,7 @@
     <div class="modal-card">
         <h3>身分驗證</h3>
         <div class="student-badge" id="modalStudentName">101 班 陳士軒</div>
-        <div class="desc">請輸入密碼 (password)</div>
+        <div class="desc">請輸入驗證密碼 (password)</div>
         <input type="password" id="modalPassword" class="modal-input" placeholder="••••" onkeypress="if(event.key==='Enter') confirmAuth()">
         <div class="modal-actions">
             <button class="modal-btn btn-cancel" onclick="closeAuthModal()">取消</button>
@@ -368,8 +361,7 @@
 </div>
 
 <script>
-    // =========== ⚠️ 貼上您最新部署的 Apps Script 網址 ⚠️ ===========
-    // 例：const API_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+    // 確保填入正確的 Apps Script Web App URL
     const API_URL = "https://script.google.com/macros/s/AKfycbxk2YLVQFU6SGPMk-gsjlvA7gbSOhybLWH5dhmdCmArGAp4_MsByIMS2hM9NNIKcUXtGg/exec"; 
     
     let globalData = {};
@@ -387,25 +379,20 @@
                 globalData = data;
                 document.getElementById('loading').style.display = 'none';
                 
-                // 啟動計時器
                 startTimer(globalData.settings.startTime, globalData.settings.endTime);
-                
                 renderClasses();
                 showStep(1);
             } catch (err) {
-                console.error("解析失敗，後端回傳內容為：", text);
                 document.getElementById('loading').innerHTML = `
-                    <div style='color:red; margin-bottom:10px;'>⚠️ 讀取資料失敗！後端回傳了非預期的格式。</div>
-                    <div style='font-size:14px; color:#555;'>👉 請確認您的 Apps Script 是否有按「<b>建立新版本部署</b>」。</div>
+                    <div style='color:red; margin-bottom:10px;'>⚠️ 讀取資料失敗！</div>
+                    <div style='font-size:14px; color:#555;'>請確認您的 Apps Script 是否有按「<b>建立新版本部署</b>」。</div>
                 `;
             }
         })
         .catch(err => {
-            console.error("連線錯誤：", err);
             document.getElementById('loading').innerHTML = "<span style='color:red;'>⚠️ 網路連線失敗！請確認 API 網址是否正確。</span>";
         });
 
-    // ========== 時間倒數與狀態判斷 ==========
     function startTimer(startStr, endStr) {
         const startTime = new Date(startStr).getTime();
         const endTime = new Date(endStr).getTime();
@@ -491,11 +478,7 @@
     }
 
     function selectClass(cls) {
-        if (!isRegistrationOpen) {
-            alert("目前非報名開放時間！");
-            return;
-        }
-
+        if (!isRegistrationOpen) return alert("目前非報名開放時間！");
         currentClass = cls;
         currentStudent = null;
         document.getElementById('step2-title').innerText = cls + ' 班學生名單';
@@ -506,14 +489,14 @@
         globalData.students[cls].forEach(student => {
             const card = document.createElement('div');
             card.className = 'student-card';
+            // 將座號補0顯示 (如 01號, 02號)
             card.innerHTML = `
-                <div class="num">${student.num}號</div>
+                <div class="num">${String(student.num).padStart(2, '0')}號</div>
                 <div class="name">${student.name}</div>
             `;
             card.onclick = () => openAuthModal(student);
             grid.appendChild(card);
         });
-        
         showStep(2);
     }
 
@@ -533,10 +516,8 @@
     function confirmAuth() {
         const pwd = document.getElementById('modalPassword').value.trim();
         if (!pwd) return alert("請輸入密碼！");
-        
         verifiedPassword = pwd;
         closeAuthModal();
-        
         renderClubs(currentStudent.grade);
         showStep(3);
     }
@@ -546,14 +527,15 @@
         clubContainer.innerHTML = '';
         
         let availableClubs = globalData.clubs.filter(club => club.target.includes(studentGrade));
-        
         if (availableClubs.length === 0) {
             clubContainer.innerHTML = '<p style="text-align:center; color:#888;">目前沒有適合您年級的社團。</p>';
             return;
         }
 
-        // ====== 新增：抓取學生先前的報名紀錄並自動打勾 ======
-        const studentKey = currentClass + "_" + currentStudent.num;
+        // ============================================
+        // 抓取該生過去的報名紀錄 (轉為統一數字比對)
+        // ============================================
+        const studentKey = currentClass + "_" + Number(currentStudent.num);
         const pastSelections = globalData.registrations && globalData.registrations[studentKey] 
                                 ? globalData.registrations[studentKey] : [];
 
@@ -562,9 +544,10 @@
 
             const div = document.createElement('div');
             div.className = 'club-card';
+            // 將社團的「星期幾 (club.day)」透過 data-day 綁定在 input 標籤上
             div.innerHTML = `
                 <label style="cursor:pointer; display:flex; align-items:flex-start;">
-                    <input type="checkbox" name="clubChoice" value="${club.name}" ${isChecked} style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
+                    <input type="checkbox" name="clubChoice" value="${club.name}" data-day="${club.day}" ${isChecked} style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
                     <div>
                         <h3 style="margin: 0 0 5px 0; color: var(--header-green); font-size: 16px;">${club.name}</h3>
                         <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
@@ -582,7 +565,20 @@
         const selectedCheckboxes = document.querySelectorAll('input[name="clubChoice"]:checked');
         if (selectedCheckboxes.length === 0) return alert("請至少選擇一個社團！");
         
-        const selectedClubsArray = Array.from(selectedCheckboxes).map(cb => cb.value);
+        // ============================================
+        // 同一星期防呆檢查：阻止報名衝突的時段
+        // ============================================
+        const selectedDays = [];
+        const selectedClubsArray = [];
+        
+        for (let cb of selectedCheckboxes) {
+            const day = cb.getAttribute('data-day'); // 取出星期幾
+            if (selectedDays.includes(day)) {
+                return alert(`⚠️ 發生時段衝突！\n您重複選擇了「星期${day}」的社團，每天只能報名一個。`);
+            }
+            selectedDays.push(day);
+            selectedClubsArray.push(cb.value);
+        }
 
         const payload = {
             cls: currentClass,
