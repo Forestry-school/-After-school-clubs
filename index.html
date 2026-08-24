@@ -69,7 +69,7 @@
             font-weight: bold;
             line-height: 1.5;
         }
-        .timer-box .icon { color: #ff4d4d; margin-right: 5px; }
+        .timer-box .icon { margin-right: 5px; }
 
         /* 進度條 */
         .progress-bar {
@@ -203,6 +203,10 @@
             width: 100%;
             margin-top: 15px;
         }
+        .btn-submit:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
 
         /* 彈跳視窗 (Modal) 樣式 */
         .modal-overlay {
@@ -289,14 +293,16 @@
 <body>
 
 <div class="container">
-    <!-- 頂部資訊卡片 (已修正為小寫 logo.jpg) -->
+    <!-- 頂部資訊卡片 -->
     <div class="header-card">
         <img src="logo.jpg" alt="Logo" onerror="this.style.display='none';">
         <h1>115學年度 第一學期</h1>
-        <p>線上選社志願序</p>
+        <!-- 修正了標題 -->
+        <p>課後社團報名系統</p> 
         <div class="timer-box">
-            <span class="icon">🚫</span>報名尚未開始<br>
-            <span style="font-family: monospace; font-size: 16px;">00天 00時 00分 00秒</span>
+            <!-- 加上了 id 供計時器修改 -->
+            <span class="icon" id="timerIcon">⏳</span><span id="timerText">時間載入中...</span><br>
+            <span id="countdown" style="font-family: monospace; font-size: 16px;">--天 --時 --分 --秒</span>
         </div>
     </div>
 
@@ -344,7 +350,7 @@
             <h2 class="section-title">請選擇課後社團 (可多選)</h2>
         </div>
         <div id="clubList"></div>
-        <button class="btn-submit" onclick="submitForm()">確認送出 (可再次修改)</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitForm()">確認送出 (可再次修改)</button>
     </div>
 
     <!-- 完成畫面 -->
@@ -376,6 +382,7 @@
     let currentClass = "";
     let currentStudent = null;
     let verifiedPassword = "";
+    let timerInterval = null;
 
     fetch(API_URL + "?action=getInitialData")
         .then(res => res.json())
@@ -384,151 +391,194 @@
             document.getElementById('loading').style.display = 'none';
             renderClasses();
             showStep(1);
+            
+            // 啟動計時器
+            if(data.settings.startTime && data.settings.endTime) {
+                startTimer(data.settings.startTime, data.settings.endTime);
+            }
         })
         .catch(err => {
             document.getElementById('loading').innerText = "資料載入失敗，請確認網路連線。";
             console.error(err);
         });
 
-    function updateProgress(stepNumber) {
-        document.querySelectorAll('.step-indicator').forEach((el, index) => {
-            if (index < stepNumber) {
-                el.classList.add('active');
+    // ====== 計時器核心邏輯 ======
+    function startTimer(startStr, endStr) {
+        const timerIcon = document.getElementById('timerIcon');
+        const timerText = document.getElementById('timerText');
+        const countdownEl = document.getElementById('countdown');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // 將 Google Sheet 的時間轉換為 timestamp
+        const startTime = new Date(startStr).getTime();
+        const endTime = new Date(endStr).getTime();
+
+        timerInterval = setInterval(() => {
+            const now = new Date().getTime();
+            
+            if (now < startTime) {
+                // 尚未開始
+                timerIcon.innerText = "🚫";
+                timerIcon.style.color = "#ff4d4d";
+                timerText.innerText = "報名尚未開始";
+                updateCountdownString(countdownEl, startTime - now);
+                submitBtn.disabled = true;
+                submitBtn.innerText = "報名尚未開始";
+            } else if (now >= startTime && now <= endTime) {
+                // 報名期間
+                timerIcon.innerText = "✅";
+                timerIcon.style.color = "#4CAF50"; // 變成綠色勾勾
+                timerText.innerText = "報名開放中，距離結束還有：";
+                updateCountdownString(countdownEl, endTime - now);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "確認送出 (可再次修改)";
             } else {
-                el.classList.remove('active');
+                // 已經結束
+                timerIcon.innerText = "🛑";
+                timerIcon.style.color = "#ff4d4d";
+                timerText.innerText = "報名已截止";
+                countdownEl.innerText = "00天 00時 00分 00秒";
+                submitBtn.disabled = true;
+                submitBtn.innerText = "已逾報名時間";
+                clearInterval(timerInterval);
             }
-        });
+        }, 1000);
     }
 
-    function showStep(stepNumber) {
-        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-        document.getElementById('step' + stepNumber).classList.add('active');
-        updateProgress(stepNumber);
-    }
+    function updateCountdownString(element, distance) {
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((這兩個問題非常關鍵！手動拆分資料確實太花時間了，我們直接讓程式幫您把社團**分配到獨立的欄位**中（例如 E欄放志願1、F欄放志願2...）。
 
-    function renderClasses() {
-        const classContainer = document.getElementById('classList');
-        const classes = Object.keys(globalData.students).sort();
-        
-        classes.forEach(cls => {
-            const div = document.createElement('div');
-            div.className = 'class-btn';
-            div.innerText = cls + ' 班';
-            div.onclick = () => selectClass(cls);
-            classContainer.appendChild(div);
-        });
-    }
+同時，我也幫您把**倒數計時器**寫好，它現在會去抓取您 Google Sheet 「系統設定」表單中的時間，並且動態倒數，標題也為您更正為「課後社團報名系統」。
 
-    function selectClass(cls) {
-        currentClass = cls;
-        currentStudent = null;
-        document.getElementById('step2-title').innerText = cls + ' 班學生名單';
-        
-        const grid = document.getElementById('studentGrid');
-        grid.innerHTML = '';
-        
-        globalData.students[cls].forEach(student => {
-            const card = document.createElement('div');
-            card.className = 'student-card';
-            card.innerHTML = `
-                <div class="num">${student.num}號</div>
-                <div class="name">${student.name}</div>
-            `;
-            card.onclick = () => openAuthModal(student);
-            grid.appendChild(card);
-        });
-        
-        showStep(2);
-    }
+請依照以下步驟分別更新您的 **後端 (`code.gs`)** 與 **前端 (HTML)**：
 
-    function openAuthModal(student) {
-        currentStudent = student;
-        document.getElementById('modalStudentName').innerText = `${currentClass} 班 ${student.name}`;
-        const pwdInput = document.getElementById('modalPassword');
-        pwdInput.value = '';
-        document.getElementById('authModal').classList.add('active');
-        setTimeout(() => pwdInput.focus(), 150);
-    }
+### 1. 更新 Google Apps Script (`code.gs`)
+我們需要修改 `doPost` 的儲存邏輯，將陣列拆開並寫入多個欄位。請將您的 `code.gs` 完整替換為以下程式碼：
 
-    function closeAuthModal() {
-        document.getElementById('authModal').classList.remove('active');
-    }
+```javascript
+const SCRIPT_PROP = PropertiesService.getScriptProperties();
 
-    function confirmAuth() {
-        const pwd = document.getElementById('modalPassword').value.trim();
-        if (!pwd) return alert("請輸入密碼！");
-        
-        verifiedPassword = pwd;
-        closeAuthModal();
-        
-        renderClubs(currentStudent.grade);
-        showStep(3);
-    }
+function setup() {
+  const doc = SpreadsheetApp.getActiveSpreadsheet();
+  SCRIPT_PROP.setProperty("key", doc.getId());
+}
 
-    function renderClubs(studentGrade) {
-        const clubContainer = document.getElementById('clubList');
-        clubContainer.innerHTML = '';
-        
-        let availableClubs = globalData.clubs.filter(club => club.target.includes(studentGrade));
-        
-        if (availableClubs.length === 0) {
-            clubContainer.innerHTML = '<p style="text-align:center; color:#888;">目前沒有適合您年級的社團。</p>';
-            return;
+// 處理前端抓取資料的請求 (GET)
+function doGet(e) {
+  const doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
+  
+  // 取得系統設定
+  const settingSheet = doc.getSheetByName("系統設定");
+  const settings = {
+    startTime: settingSheet.getRange("B1").getValue(), // 必須是有效日期格式
+    endTime: settingSheet.getRange("B2").getValue()    // 必須是有效日期格式
+  };
+  
+  // 取得學生名單
+  const studentSheet = doc.getSheetByName("學生名單");
+  const studentData = studentSheet.getDataRange().getValues();
+  const students = {};
+  for (let i = 1; i < studentData.length; i++) {
+    let cls = studentData[i][0];
+    if (!students[cls]) students[cls] = [];
+    students[cls].push({
+      num: studentData[i][1],
+      name: studentData[i][2],
+      grade: studentData[i][3],
+      pwd: studentData[i][4]
+    });
+  }
+  
+  // 取得社團總表
+  const clubSheet = doc.getSheetByName("社團總表");
+  const clubData = clubSheet.getDataRange().getValues();
+  const clubs = [];
+  for (let i = 1; i < clubData.length; i++) {
+    clubs.push({
+      name: clubData[i][0],
+      day: clubData[i][1],
+      target: String(clubData[i][2]), 
+      desc: clubData[i][3],
+      fee: clubData[i][4],
+      limit: clubData[i][5],
+      teacher: clubData[i][6],
+      room: clubData[i][7]
+    });
+  }
+
+  const result = {
+    settings: settings,
+    students: students,
+    clubs: clubs
+  };
+
+  return ContentService
+    .createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// 處理前端送出的報名資料 (POST)
+function doPost(e) {
+  const doc = SpreadsheetApp.openById(SCRIPT_PROP.getProperty("key"));
+  const resultSheet = doc.getSheetByName("報名結果");
+  const studentSheet = doc.getSheetByName("學生名單");
+  
+  try {
+    const data = JSON.parse(e.postData.contents);
+    
+    // 1. 驗證密碼
+    const studentData = studentSheet.getDataRange().getValues();
+    let isValid = false;
+    for (let i = 1; i < studentData.length; i++) {
+      if (studentData[i][0] == data.cls && studentData[i][1] == data.num) {
+        if (String(studentData[i][4]) === String(data.pwd)) {
+          isValid = true;
+          break;
         }
-
-        availableClubs.forEach((club) => {
-            const div = document.createElement('div');
-            div.className = 'club-card';
-            div.innerHTML = `
-                <label style="cursor:pointer; display:flex; align-items:flex-start;">
-                    <input type="checkbox" name="clubChoice" value="${club.name}" style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
-                    <div>
-                        <h3 style="margin: 0 0 5px 0; color: var(--header-green); font-size: 16px;">${club.name}</h3>
-                        <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
-                        <p style="margin: 0; font-size: 12px; color: #888;">${club.desc}</p>
-                    </div>
-                </label>
-            `;
-            clubContainer.appendChild(div);
-        });
+      }
     }
-
-    function submitForm() {
-        const selectedCheckboxes = document.querySelectorAll('input[name="clubChoice"]:checked');
-        if (selectedCheckboxes.length === 0) return alert("請至少選擇一個社團！");
-        
-        const selectedClubsArray = Array.from(selectedCheckboxes).map(cb => cb.value);
-
-        const payload = {
-            cls: currentClass,
-            num: currentStudent.num,
-            name: currentStudent.name,
-            pwd: verifiedPassword,
-            selectedClubs: selectedClubsArray
-        };
-
-        document.getElementById('step3').innerHTML = '<h2 style="text-align:center; color:var(--text-grey);">資料傳送中，請稍候...</h2>';
-
-        fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-                document.getElementById('step-success').classList.add('active');
-            } else {
-                alert(data.message); 
-                location.reload();
-            }
-        })
-        .catch(err => {
-            alert("系統發生錯誤，請稍後再試。");
-            console.error(err);
-        });
+    
+    if (!isValid) {
+      return ContentService.createTextOutput(JSON.stringify({status: "error", message: "密碼驗證失敗！"})).setMimeType(ContentService.MimeType.JSON);
     }
-</script>
-
-</body>
-</html>
+    
+    // ======== 將社團陣列拆開 (解決手工拆分的問題) ========
+    let clubsToSave = data.selectedClubs;
+    if (!Array.isArray(clubsToSave)) {
+      clubsToSave = [clubsToSave];
+    }
+    
+    // 2. 寫入或修改報名結果
+    const existingData = resultSheet.getDataRange().getValues();
+    let updated = false;
+    const timestamp = new Date();
+    
+    for (let i = 1; i < existingData.length; i++) {
+      if (existingData[i][1] == data.cls && existingData[i][2] == data.num) {
+        resultSheet.getRange(i + 1, 1).setValue(timestamp);
+        // 先清除舊的社團資料 (假設最多報名15個，清空第5到第20欄)
+        resultSheet.getRange(i + 1, 5, 1, 15).clearContent();
+        // 將新的社團陣列一次性寫入多個欄位
+        if(clubsToSave.length > 0) {
+          resultSheet.getRange(i + 1, 5, 1, clubsToSave.length).setValues([clubsToSave]);
+        }
+        updated = true;
+        break;
+      }
+    }
+    
+    // 如果沒有舊紀錄，則新增一行 (使用展開運算子 ...clubsToSave 自動拆成多欄)
+    if (!updated) {
+      let rowData = [timestamp, data.cls, data.num, data.name, ...clubsToSave];
+      resultSheet.appendRow(rowData);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({status: "success", message: "報名成功！"})).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: error.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
