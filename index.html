@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115學年度 課後社團報名系統</title>
     <style>
-        /* 龍貓森林風格配色 */
+        /* 參照第二張圖的質感配色 */
         :root {
-            --primary-green: #5c7a52; /* 森林深綠 */
-            --light-green: #89a87d;   /* 樹葉淺綠 */
-            --totoro-grey: #8a8d8f;   /* 龍貓灰 */
-            --bg-color: #f4f7f4;      /* 米白背景 */
+            --primary-green: #2c5a3d; /* 深綠色標題/按鈕 */
+            --light-bg: #eef2ed;      /* 頂部區塊淺綠背景 */
+            --card-bg: #fcfbf7;       /* 學生卡片米白背景 */
             --text-dark: #333333;
+            --text-grey: #8a8d8f;
             --white: #ffffff;
+            --border-color: #e5e5e5;
         }
         body {
             font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
-            background-color: var(--bg-color);
+            background-color: #f4f7f4;
             color: var(--text-dark);
             margin: 0;
             padding: 20px;
@@ -25,97 +26,224 @@
         }
         .container {
             background-color: var(--white);
-            max-width: 600px;
+            max-width: 500px;
             width: 100%;
             border-radius: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            padding: 30px;
-            border: 2px solid var(--light-green);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            box-sizing: border-box;
         }
-        .header {
+        /* 頂部資訊卡片 */
+        .header-card {
+            background-color: var(--light-bg);
+            border-radius: 15px;
+            padding: 20px;
             text-align: center;
             margin-bottom: 25px;
-            border-bottom: 2px dashed var(--light-green);
-            padding-bottom: 15px;
         }
-        .header img {
-            max-height: 80px;
+        .header-card img {
+            max-height: 40px;
             margin-bottom: 10px;
         }
-        .header h1 {
+        .header-card h1 {
             color: var(--primary-green);
-            font-size: 22px;
-            margin: 5px 0;
+            font-size: 20px;
+            margin: 5px 0 0 0;
         }
-        .step-container {
-            display: none;
-            animation: fadeIn 0.5s;
+        .header-card p {
+            color: var(--primary-green);
+            font-size: 14px;
+            margin: 5px 0 15px 0;
+            font-weight: bold;
         }
-        .step-container.active {
-            display: block;
+        .timer-box {
+            background-color: #2b2b2b;
+            color: white;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.5;
         }
-        h2 {
-            color: var(--totoro-grey);
+        .timer-box .icon { color: #ff4d4d; margin-right: 5px; }
+
+        /* 進度條 */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-grey);
+            font-weight: bold;
+        }
+        .step-indicator.active { color: var(--primary-green); }
+        .step-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--white);
+            border: 2px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        .step-indicator.active .step-circle {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            color: var(--white);
+        }
+        .step-line {
+            width: 40px;
+            height: 2px;
+            background-color: #ccc;
+            margin: 0 10px;
+            transform: translateY(-10px);
+        }
+
+        /* 內容區塊控制 */
+        .step-content { display: none; animation: fadeIn 0.4s ease; }
+        .step-content.active { display: block; }
+
+        /* 返回按鈕與標題 */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .btn-back {
+            position: absolute;
+            left: 0;
+            background-color: #f0f4f8;
+            border: 1px solid #d1d9e0;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .btn-back::before {
+            content: '⬅';
+            color: #0056b3;
+            margin-right: 4px;
+        }
+        .section-title {
             font-size: 18px;
-            text-align: center;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin: 0;
         }
-        .grid-btn {
+
+        /* 學生卡片網格 */
+        .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            gap: 12px;
         }
-        button, .btn {
-            background-color: var(--primary-green);
-            color: var(--white);
-            border: none;
+        .student-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .student-card:hover { border-color: var(--primary-green); }
+        .student-card.selected {
+            border-color: var(--primary-green);
+            background-color: #f0f7f2;
+            box-shadow: 0 0 0 1px var(--primary-green);
+        }
+        .student-card .num {
+            font-size: 12px;
+            color: var(--text-grey);
+            margin-bottom: 5px;
+        }
+        .student-card .name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        /* 班級選擇按鈕 */
+        .class-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             padding: 15px;
             border-radius: 12px;
             font-size: 18px;
             font-weight: bold;
+            color: var(--text-dark);
             cursor: pointer;
-            transition: all 0.3s ease;
             text-align: center;
+            transition: all 0.2s;
         }
-        button:hover, .btn:hover {
-            background-color: var(--light-green);
-            transform: translateY(-2px);
-        }
-        .form-group {
-            margin-bottom: 15px;
+        .class-btn:hover { border-color: var(--primary-green); background-color: #f0f7f2; }
+
+        /* 密碼區塊與主按鈕 */
+        .password-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            display: none; /* 預設隱藏，點擊學生後顯示 */
         }
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: var(--primary-green);
             font-weight: bold;
+            color: var(--primary-green);
+            font-size: 14px;
         }
-        .form-group select, .form-group input {
+        .form-group input {
             width: 100%;
             padding: 12px;
-            border: 2px solid var(--light-green);
-            border-radius: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
+            margin-bottom: 15px;
         }
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* 社團卡片 */
         .club-card {
-            border: 1px solid var(--light-green);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
-            background-color: #fafdfa;
+            background-color: var(--card-bg);
+            cursor: pointer;
         }
-        .club-card h3 {
-            margin: 0 0 10px 0;
-            color: var(--primary-green);
-        }
-        #loading {
-            text-align: center;
-            color: var(--totoro-grey);
-            font-weight: bold;
-        }
+        .club-card:hover { border-color: var(--primary-green); }
+
+        #loading { text-align: center; color: var(--text-grey); font-weight: bold; margin-bottom: 20px; }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -123,55 +251,85 @@
 <body>
 
 <div class="container">
-    <div class="header">
-        <img src="Logo.jpg" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=LOGO'">
-        <h1>福瑞斯特中小學</h1>
-        <h2>115學年度 第一學期 課後社團選社</h2>
+    <!-- 頂部資訊卡片 -->
+    <div class="header-card">
+        <!-- 若有真實Logo網址可替換 src -->
+        <img src="Logo.jpg" alt="Logo" onerror="this.src='https://via.placeholder.com/200x50?text=福瑞斯特中小學Logo'">
+        <h1>115學年度 第一學期</h1>
+        <p>線上選社志願序</p>
+        <div class="timer-box">
+            <span class="icon">🚫</span>報名已截止<br>
+            <span style="font-family: monospace; font-size: 16px;">00天 00時 00分 00秒</span>
+        </div>
+    </div>
+
+    <!-- 進度條 -->
+    <div class="progress-bar">
+        <div class="step-indicator active" id="indicator1">
+            <div class="step-circle">1</div>
+            <span>選班級</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-indicator" id="indicator2">
+            <div class="step-circle">2</div>
+            <span>點名字</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step-indicator" id="indicator3">
+            <div class="step-circle">3</div>
+            <span>排志願</span>
+        </div>
     </div>
 
     <div id="loading">系統資料載入中，請稍候...</div>
 
     <!-- Step 1: 選班級 -->
-    <div id="step1" class="step-container">
-        <h2>1. 請選擇班級</h2>
-        <div class="grid-btn" id="classList"></div>
+    <div id="step1" class="step-content">
+        <div class="section-header">
+            <h2 class="section-title">請選擇班級</h2>
+        </div>
+        <div class="grid-container" id="classList"></div>
     </div>
 
-    <!-- Step 2 & 3: 點名字與輸入密碼 -->
-    <div id="step2" class="step-container">
-        <h2>2. 選擇姓名與驗證密碼</h2>
-        <div class="form-group">
-            <label>選擇學生：</label>
-            <select id="studentSelect">
-                <option value="">請選擇...</option>
-            </select>
+    <!-- Step 2: 點名字與輸入密碼 -->
+    <div id="step2" class="step-content">
+        <div class="section-header">
+            <button class="btn-back" onclick="showStep(1)">上一頁</button>
+            <h2 class="section-title" id="step2-title">班級學生名單</h2>
         </div>
-        <div class="form-group">
-            <label>驗證密碼 (password)：</label>
-            <input type="password" id="studentPwd" placeholder="請輸入密碼">
+        
+        <!-- 學生卡片網格 -->
+        <div class="grid-container" id="studentGrid"></div>
+
+        <!-- 選擇學生後展開的密碼區塊 -->
+        <div class="password-section" id="passwordSection">
+            <div class="form-group">
+                <label>請輸入驗證密碼 (password)：</label>
+                <input type="password" id="studentPwd" placeholder="輸入密碼以驗證身分">
+            </div>
+            <button class="btn-primary" onclick="goToStep3()">下一步</button>
         </div>
-        <button onclick="goToStep3()" style="width: 100%;">下一步</button>
-        <button onclick="showStep('step1')" style="width: 100%; margin-top: 10px; background-color: var(--totoro-grey);">上一步</button>
     </div>
 
-    <!-- Step 4 & 5: 報名課後與送出 -->
-    <div id="step3" class="step-container">
-        <h2>3. 選擇課後社團</h2>
+    <!-- Step 3: 排志願 -->
+    <div id="step3" class="step-content">
+        <div class="section-header">
+            <button class="btn-back" onclick="showStep(2)">上一頁</button>
+            <h2 class="section-title">選擇課後社團</h2>
+        </div>
         <div id="clubList"></div>
-        <button onclick="submitForm()" style="width: 100%; margin-top: 20px;">確認送出 (可再次修改)</button>
-        <button onclick="showStep('step2')" style="width: 100%; margin-top: 10px; background-color: var(--totoro-grey);">上一步</button>
+        <button class="btn-primary" style="margin-top: 15px;" onclick="submitForm()">確認送出 (可再次修改)</button>
     </div>
 
     <!-- 完成畫面 -->
-    <div id="step-success" class="step-container" style="text-align: center;">
+    <div id="step-success" class="step-content" style="text-align: center; padding: 30px 0;">
         <h2 style="color: var(--primary-green);">報名資料已送出！</h2>
-        <p>若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
-        <button onclick="location.reload()" style="margin-top: 20px;">回首頁</button>
+        <p style="color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
+        <button class="btn-primary" onclick="location.reload()">回首頁</button>
     </div>
 </div>
 
 <script>
-    // =========== 請將下方 URL 替換為您的 Apps Script 網頁應用程式網址 ===========
     const API_URL = "https://script.google.com/macros/s/AKfycbxk2YLVQFU6SGPMk-gsjlvA7gbSOhybLWH5dhmdCmArGAp4_MsByIMS2hM9NNIKcUXtGg/exec"; 
     
     let globalData = {};
@@ -185,64 +343,97 @@
             globalData = data;
             document.getElementById('loading').style.display = 'none';
             renderClasses();
-            showStep('step1');
+            showStep(1);
         })
         .catch(err => {
             document.getElementById('loading').innerText = "資料載入失敗，請確認網路連線。";
             console.error(err);
         });
 
-    function showStep(stepId) {
-        document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-        document.getElementById(stepId).classList.add('active');
+    function updateProgress(stepNumber) {
+        document.querySelectorAll('.step-indicator').forEach((el, index) => {
+            if (index < stepNumber) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
     }
 
-    // 渲染班級按鈕
+    function showStep(stepNumber) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + stepNumber).classList.add('active');
+        updateProgress(stepNumber);
+    }
+
+    // Step 1: 渲染班級按鈕
     function renderClasses() {
         const classContainer = document.getElementById('classList');
         const classes = Object.keys(globalData.students).sort();
         
         classes.forEach(cls => {
-            const btn = document.createElement('button');
-            btn.innerText = cls;
-            btn.onclick = () => selectClass(cls);
-            classContainer.appendChild(btn);
+            const div = document.createElement('div');
+            div.className = 'class-btn';
+            div.innerText = cls + ' 班';
+            div.onclick = () => selectClass(cls);
+            classContainer.appendChild(div);
         });
     }
 
-    // 選擇班級
+    // Step 2: 渲染該班級學生卡片
     function selectClass(cls) {
         currentClass = cls;
-        const studentSelect = document.getElementById('studentSelect');
-        studentSelect.innerHTML = '<option value="">請選擇...</option>';
+        currentStudent = null;
+        document.getElementById('step2-title').innerText = cls + ' 班學生名單';
+        
+        const grid = document.getElementById('studentGrid');
+        grid.innerHTML = '';
         
         globalData.students[cls].forEach(student => {
-            const opt = document.createElement('option');
-            opt.value = JSON.stringify(student);
-            opt.innerText = `${student.num}號 - ${student.name}`;
-            studentSelect.appendChild(opt);
+            const card = document.createElement('div');
+            card.className = 'student-card';
+            card.innerHTML = `
+                <div class="num">${student.num}號</div>
+                <div class="name">${student.name}</div>
+            `;
+            card.onclick = () => selectStudent(card, student);
+            grid.appendChild(card);
         });
         
+        // 重置密碼區塊
+        document.getElementById('passwordSection').style.display = 'none';
         document.getElementById('studentPwd').value = '';
-        showStep('step2');
+        
+        showStep(2);
     }
 
-    // 前往選社團
+    // 點擊學生卡片後顯示密碼輸入框
+    function selectStudent(cardElement, student) {
+        // 清除其他卡片的選取狀態
+        document.querySelectorAll('.student-card').forEach(el => el.classList.remove('selected'));
+        // 標記當前選取的卡片
+        cardElement.classList.add('selected');
+        
+        currentStudent = student;
+        
+        // 展開密碼輸入區塊並聚焦
+        const pwdSection = document.getElementById('passwordSection');
+        pwdSection.style.display = 'block';
+        setTimeout(() => document.getElementById('studentPwd').focus(), 100);
+    }
+
+    // 驗證並前往 Step 3
     function goToStep3() {
-        const studentVal = document.getElementById('studentSelect').value;
         const pwd = document.getElementById('studentPwd').value;
         
-        if (!studentVal) return alert("請選擇姓名！");
-        if (!pwd) return alert("請輸入密碼！");
+        if (!currentStudent) return alert("請先點選學生姓名！");
+        if (!pwd) return alert("請輸入驗證密碼！");
         
-        currentStudent = JSON.parse(studentVal);
-        
-        // 渲染符合該學生年級的社團
         renderClubs(currentStudent.grade);
-        showStep('step3');
+        showStep(3);
     }
 
-    // 渲染社團列表
+    // Step 3: 渲染社團列表
     function renderClubs(studentGrade) {
         const clubContainer = document.getElementById('clubList');
         clubContainer.innerHTML = '';
@@ -250,20 +441,20 @@
         let availableClubs = globalData.clubs.filter(club => club.target.includes(studentGrade));
         
         if (availableClubs.length === 0) {
-            clubContainer.innerHTML = '<p>目前沒有適合您年級的社團。</p>';
+            clubContainer.innerHTML = '<p style="text-align:center; color:#888;">目前沒有適合您年級的社團。</p>';
             return;
         }
 
-        availableClubs.forEach((club, index) => {
+        availableClubs.forEach((club) => {
             const div = document.createElement('div');
             div.className = 'club-card';
             div.innerHTML = `
-                <label style="cursor:pointer; display:flex; align-items:center;">
-                    <input type="radio" name="clubChoice" value="${club.name}" style="width:20px; height:20px; margin-right:15px;">
+                <label style="cursor:pointer; display:flex; align-items:flex-start;">
+                    <input type="radio" name="clubChoice" value="${club.name}" style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
                     <div>
-                        <h3>${club.name}</h3>
-                        <p style="margin:5px 0; font-size:14px; color:#555;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
-                        <p style="margin:0; font-size:13px; color:#777;">${club.desc}</p>
+                        <h3 style="margin: 0 0 5px 0; color: var(--primary-green); font-size: 16px;">${club.name}</h3>
+                        <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
+                        <p style="margin: 0; font-size: 12px; color: #888;">${club.desc}</p>
                     </div>
                 </label>
             `;
@@ -285,8 +476,7 @@
             selectedClubs: selectedClub.value
         };
 
-        // 顯示載入中
-        document.getElementById('step3').innerHTML = '<h2>資料傳送中，請稍候...</h2>';
+        document.getElementById('step3').innerHTML = '<h2 style="text-align:center; color:var(--text-grey);">資料傳送中，請稍候...</h2>';
 
         fetch(API_URL, {
             method: 'POST',
@@ -295,7 +485,8 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                showStep('step-success');
+                document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+                document.getElementById('step-success').classList.add('active');
             } else {
                 alert(data.message); // 可能是密碼錯誤
                 location.reload();
