@@ -416,11 +416,12 @@
         <div class="step-indicator" id="indicator2">
             <div class="step-circle">🙋</div>
             <span>點名字</span>
+            <span>輸入密碼</span>
         </div>
         <div class="step-line"></div>
         <div class="step-indicator" id="indicator3">
             <div class="step-circle">🎒</div>
-            <span>排志願</span>
+            <span>報名</span>
         </div>
     </div>
 
@@ -454,7 +455,7 @@
     <div id="step-success" class="step-content" style="text-align: center; padding: 30px 0;">
         <div style="font-size: 52px; margin-bottom: 6px;">🎉</div>
         <h2 style="font-family: 'Noto Sans TC', sans-serif; font-weight: 900; font-size: 24px; color: var(--header-green);">報名資料已送出！</h2>
-        <p style="font-size: 16px; color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
+        <p style="font-size: 16px; color: var(--text-grey); margin-bottom: 25px;">若需修改資料，請重新登入並再次送出即可覆蓋舊資料。</p>
         <button class="btn-submit" onclick="location.reload()">🏠 回首頁</button>
     </div>
 </div>
@@ -465,7 +466,7 @@
         <div style="font-size: 34px; margin-bottom: 4px;">🔑</div>
         <h3>身分驗證</h3>
         <div class="student-badge" id="modalStudentName">101 班 陳士軒</div>
-        <div class="desc">請輸入驗證密碼 (password)</div>
+        <div class="desc">請輸入密碼(生日4碼) (password)</div>
         <input type="password" id="modalPassword" class="modal-input" placeholder="••••" onkeypress="if(event.key==='Enter') confirmAuth()">
         <div class="modal-actions">
             <button class="modal-btn btn-cancel" onclick="closeAuthModal()">取消</button>
