@@ -6,10 +6,10 @@
     <title>115學年度 課後社團報名系統</title>
     <style>
         :root {
-            --primary-green: #0d8253; /* 彈跳視窗與按鈕綠色 */
-            --header-green: #2c5a3d;  /* 標題深綠 */
-            --light-bg: #eef2ed;      /* 頂部區塊淺綠背景 */
-            --card-bg: #fcfbf7;       /* 學生卡片米白背景 */
+            --primary-green: #0d8253;
+            --header-green: #2c5a3d;
+            --light-bg: #eef2ed;
+            --card-bg: #fcfbf7;
             --text-dark: #333333;
             --text-grey: #8a8d8f;
             --white: #ffffff;
@@ -149,7 +149,7 @@
             margin: 0;
         }
 
-        /* 卡片網格 (班級與學生) */
+        /* 卡片網格 */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -204,7 +204,7 @@
             margin-top: 15px;
         }
 
-        /* ======== 彈跳視窗 (Modal) 樣式 ======== */
+        /* 彈跳視窗 (Modal) 樣式 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -248,7 +248,6 @@
             border-radius: 10px;
             font-size: 20px;
             text-align: center;
-            letter-spacing: 5px;
             box-sizing: border-box;
             outline: none;
             margin-bottom: 25px;
@@ -290,9 +289,9 @@
 <body>
 
 <div class="container">
-    <!-- 頂部資訊卡片 -->
+    <!-- 頂部資訊卡片 (已修正為小寫 logo.jpg) -->
     <div class="header-card">
-        <img src="Logo.jpg" alt="Logo" onerror="if(!this.tried){this.tried=1;this.src='logo.jpg';}else{this.style.display='none';}">
+        <img src="logo.jpg" alt="Logo" onerror="this.style.display='none';">
         <h1>115學年度 第一學期</h1>
         <p>線上選社志願序</p>
         <div class="timer-box">
@@ -356,13 +355,13 @@
     </div>
 </div>
 
-<!-- 身分驗證彈跳視窗 (Modal) -->
+<!-- 身分驗證彈跳視窗 -->
 <div class="modal-overlay" id="authModal">
     <div class="modal-card">
         <h3>身分驗證</h3>
         <div class="student-badge" id="modalStudentName">101 班 陳士軒</div>
         <div class="desc">請輸入密碼 (password)</div>
-        <input type="password" id="modalPassword" class="modal-input" placeholder="••••" maxlength="20" onkeypress="if(event.key==='Enter') confirmAuth()">
+        <input type="password" id="modalPassword" class="modal-input" placeholder="••••" onkeypress="if(event.key==='Enter') confirmAuth()">
         <div class="modal-actions">
             <button class="modal-btn btn-cancel" onclick="closeAuthModal()">取消</button>
             <button class="modal-btn btn-confirm" onclick="confirmAuth()">確認進入</button>
@@ -378,7 +377,6 @@
     let currentStudent = null;
     let verifiedPassword = "";
 
-    // 初始化抓取資料
     fetch(API_URL + "?action=getInitialData")
         .then(res => res.json())
         .then(data => {
@@ -408,7 +406,6 @@
         updateProgress(stepNumber);
     }
 
-    // Step 1: 渲染班級按鈕
     function renderClasses() {
         const classContainer = document.getElementById('classList');
         const classes = Object.keys(globalData.students).sort();
@@ -422,7 +419,6 @@
         });
     }
 
-    // Step 2: 渲染該班級學生卡片
     function selectClass(cls) {
         currentClass = cls;
         currentStudent = null;
@@ -445,7 +441,6 @@
         showStep(2);
     }
 
-    // 開啟彈跳驗證視窗
     function openAuthModal(student) {
         currentStudent = student;
         document.getElementById('modalStudentName').innerText = `${currentClass} 班 ${student.name}`;
@@ -455,12 +450,10 @@
         setTimeout(() => pwdInput.focus(), 150);
     }
 
-    // 關閉彈跳驗證視窗
     function closeAuthModal() {
         document.getElementById('authModal').classList.remove('active');
     }
 
-    // 彈跳視窗確認進入 (前往 Step 3)
     function confirmAuth() {
         const pwd = document.getElementById('modalPassword').value.trim();
         if (!pwd) return alert("請輸入密碼！");
@@ -472,7 +465,6 @@
         showStep(3);
     }
 
-    // Step 3: 渲染社團列表 (多選 Checkbox)
     function renderClubs(studentGrade) {
         const clubContainer = document.getElementById('clubList');
         clubContainer.innerHTML = '';
@@ -501,7 +493,6 @@
         });
     }
 
-    // 最終送出
     function submitForm() {
         const selectedCheckboxes = document.querySelectorAll('input[name="clubChoice"]:checked');
         if (selectedCheckboxes.length === 0) return alert("請至少選擇一個社團！");
@@ -528,7 +519,7 @@
                 document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
                 document.getElementById('step-success').classList.add('active');
             } else {
-                alert(data.message); // 密碼錯誤提示
+                alert(data.message); 
                 location.reload();
             }
         })
