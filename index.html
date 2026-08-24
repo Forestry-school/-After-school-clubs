@@ -70,7 +70,7 @@
             line-height: 1.5;
         }
         .timer-box .icon { color: #ff4d4d; margin-right: 5px; }
-        .timer-box.active-timer .icon { color: #0d8253; } /* 進行中的顏色 */
+        .timer-box.active-timer .icon { color: #0d8253; } 
 
         /* 進度條 */
         .progress-bar {
@@ -290,14 +290,11 @@
 <body>
 
 <div class="container">
-    <!-- 頂部資訊卡片 -->
     <div class="header-card">
         <img src="logo.jpg" alt="Logo" onerror="this.style.display='none';">
         <h1>115學年度 第一學期</h1>
-        <!-- 修正標題文字 -->
         <p>課後社團 報名系統</p>
         
-        <!-- 計時器區塊 -->
         <div class="timer-box" id="timerBox">
             <span class="icon" id="timerIcon">⏳</span> <span id="timerStatus">載入時間中...</span><br>
             <span id="timerDisplay" style="font-family: monospace; font-size: 16px;">--天 --時 --分 --秒</span>
@@ -324,7 +321,7 @@
 
     <div id="loading">系統資料載入中，請稍候...</div>
 
-    <!-- Step 1: 選班級 -->
+    <!-- 步驟區塊 -->
     <div id="step1" class="step-content">
         <div class="section-header">
             <h2 class="section-title">請選擇班級</h2>
@@ -332,7 +329,6 @@
         <div class="grid-container" id="classList"></div>
     </div>
 
-    <!-- Step 2: 點名字 -->
     <div id="step2" class="step-content">
         <div class="section-header">
             <button class="btn-back" onclick="showStep(1)">上一頁</button>
@@ -341,7 +337,6 @@
         <div class="grid-container" id="studentGrid"></div>
     </div>
 
-    <!-- Step 3: 排志願 (多選) -->
     <div id="step3" class="step-content">
         <div class="section-header">
             <button class="btn-back" onclick="showStep(2)">上一頁</button>
@@ -351,7 +346,6 @@
         <button class="btn-submit" onclick="submitForm()">確認送出 (可再次修改)</button>
     </div>
 
-    <!-- 完成畫面 -->
     <div id="step-success" class="step-content" style="text-align: center; padding: 30px 0;">
         <h2 style="color: var(--header-green);">報名資料已送出！</h2>
         <p style="color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
@@ -374,32 +368,41 @@
 </div>
 
 <script>
-    // =========== 貼上您最新部署的 Apps Script 網址 ===========
+    // =========== ⚠️ 貼上您最新部署的 Apps Script 網址 ⚠️ ===========
+    // 例：const API_URL = "https://script.google.com/macros/s/AKfycb.../exec";
     const API_URL = "https://script.google.com/macros/s/AKfycbxk2YLVQFU6SGPMk-gsjlvA7gbSOhybLWH5dhmdCmArGAp4_MsByIMS2hM9NNIKcUXtGg/exec"; 
     
     let globalData = {};
     let currentClass = "";
     let currentStudent = null;
     let verifiedPassword = "";
-    
-    // 報名狀態旗標 (用來控制是否允許點選與報名)
     let isRegistrationOpen = false;
 
-    fetch(API_URL + "?action=getInitialData")
-        .then(res => res.json())
-        .then(data => {
-            globalData = data;
-            document.getElementById('loading').style.display = 'none';
-            
-            // 啟動時間計時器
-            startTimer(globalData.settings.startTime, globalData.settings.endTime);
-            
-            renderClasses();
-            showStep(1);
+    // 取得資料
+    fetch(API_URL + "?action=getInitialData", { redirect: 'follow' })
+        .then(res => res.text()) 
+        .then(text => {
+            try {
+                const data = JSON.parse(text); 
+                globalData = data;
+                document.getElementById('loading').style.display = 'none';
+                
+                // 啟動計時器
+                startTimer(globalData.settings.startTime, globalData.settings.endTime);
+                
+                renderClasses();
+                showStep(1);
+            } catch (err) {
+                console.error("解析失敗，後端回傳內容為：", text);
+                document.getElementById('loading').innerHTML = `
+                    <div style='color:red; margin-bottom:10px;'>⚠️ 讀取資料失敗！後端回傳了非預期的格式。</div>
+                    <div style='font-size:14px; color:#555;'>👉 請確認您的 Apps Script 是否有按「<b>建立新版本部署</b>」。</div>
+                `;
+            }
         })
         .catch(err => {
-            document.getElementById('loading').innerText = "資料載入失敗，請確認網路連線。";
-            console.error(err);
+            console.error("連線錯誤：", err);
+            document.getElementById('loading').innerHTML = "<span style='color:red;'>⚠️ 網路連線失敗！請確認 API 網址是否正確。</span>";
         });
 
     // ========== 時間倒數與狀態判斷 ==========
@@ -413,7 +416,7 @@
 
         if (isNaN(startTime) || isNaN(endTime)) {
             statusEl.innerText = "時間設定錯誤";
-            displayEl.innerText = "請檢查後端表單格式";
+            displayEl.innerText = "請檢查後端時間格式";
             return;
         }
 
@@ -422,21 +425,18 @@
             let targetTime = 0;
 
             if (now < startTime) {
-                // 尚未開始
                 isRegistrationOpen = false;
                 statusEl.innerText = "距離報名開始還有";
                 iconEl.innerText = "🚫";
                 boxEl.classList.remove('active-timer');
                 targetTime = startTime;
             } else if (now >= startTime && now <= endTime) {
-                // 進行中
                 isRegistrationOpen = true;
                 statusEl.innerText = "報名進行中！距離結束尚有";
                 iconEl.innerText = "✅";
                 boxEl.classList.add('active-timer');
                 targetTime = endTime;
             } else {
-                // 已結束
                 isRegistrationOpen = false;
                 statusEl.innerText = "報名已截止";
                 iconEl.innerText = "🛑";
@@ -445,7 +445,6 @@
                 return;
             }
 
-            // 計算差距並更新畫面
             const diff = targetTime - now;
             if (diff > 0) {
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -461,7 +460,6 @@
             }
         }, 1000);
     }
-    // ========================================
 
     function updateProgress(stepNumber) {
         document.querySelectorAll('.step-indicator').forEach((el, index) => {
@@ -493,7 +491,6 @@
     }
 
     function selectClass(cls) {
-        // 如果報名未開放，阻擋操作並提醒
         if (!isRegistrationOpen) {
             alert("目前非報名開放時間！");
             return;
@@ -555,12 +552,19 @@
             return;
         }
 
+        // ====== 新增：抓取學生先前的報名紀錄並自動打勾 ======
+        const studentKey = currentClass + "_" + currentStudent.num;
+        const pastSelections = globalData.registrations && globalData.registrations[studentKey] 
+                                ? globalData.registrations[studentKey] : [];
+
         availableClubs.forEach((club) => {
+            const isChecked = pastSelections.includes(club.name) ? 'checked' : '';
+
             const div = document.createElement('div');
             div.className = 'club-card';
             div.innerHTML = `
                 <label style="cursor:pointer; display:flex; align-items:flex-start;">
-                    <input type="checkbox" name="clubChoice" value="${club.name}" style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
+                    <input type="checkbox" name="clubChoice" value="${club.name}" ${isChecked} style="width:18px; height:18px; margin-right:12px; margin-top:3px;">
                     <div>
                         <h3 style="margin: 0 0 5px 0; color: var(--header-green); font-size: 16px;">${club.name}</h3>
                         <p style="margin: 0 0 5px 0; font-size: 13px; color: #666;">星期${club.day} | 費用: ${club.fee} | 老師: ${club.teacher}</p>
