@@ -5,43 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>115學年度 課後社團報名系統</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Fredoka:wght@500;600;700&display=swap');
+
         :root {
-            --primary-green: #0d8253;
-            --header-green: #2c5a3d;
-            --light-bg: #eef2ed;
-            --card-bg: #fcfbf7;
-            --text-dark: #333333;
-            --text-grey: #8a8d8f;
+            /* 保留原變數名稱以維持 JS 相容性，替換為活潑童趣色調 */
+            --primary-green: #2FBF71;   /* 草地綠 - 強調色 */
+            --header-green: #1D9E63;    /* 標題綠 */
+            --light-bg: #FFF4CC;        /* 陽光黃 - 卡片底色 */
+            --card-bg: #FFFDF6;         /* 奶油白 */
+            --text-dark: #3A3A3A;
+            --text-grey: #8A8D8F;
             --white: #ffffff;
-            --border-color: #e5e5e5;
-            --btn-cancel: #edf2f7;
+            --border-color: #FFD9A0;    /* 蜜桃橘 */
+            --btn-cancel: #FFE3DC;      /* 粉橘 */
+
+            /* 新增：童趣調色盤 */
+            --sky: #5EC6F2;
+            --sun: #FFD34D;
+            --coral: #FF6F5E;
+            --grape: #B57EE8;
+            --grass: #67D28D;
         }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
-            background-color: #f4f7f4;
+            font-family: 'Fredoka', 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
+            background:
+                radial-gradient(circle at 15% 8%, rgba(255,255,255,0.9) 0 26px, transparent 27px),
+                radial-gradient(circle at 30% 5%, rgba(255,255,255,0.75) 0 18px, transparent 19px),
+                radial-gradient(circle at 85% 10%, rgba(255,255,255,0.9) 0 22px, transparent 23px),
+                linear-gradient(180deg, var(--sky) 0%, #BDEBFF 28%, #F2FBEF 60%, #FFF9E5 100%);
+            background-attachment: fixed;
             color: var(--text-dark);
             margin: 0;
-            padding: 20px;
+            padding: 28px 16px 60px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
+
         .container {
             background-color: var(--white);
             max-width: 500px;
             width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            padding: 25px;
-            box-sizing: border-box;
+            border-radius: 28px;
+            box-shadow: 0 12px 0 rgba(0,0,0,0.06), 0 18px 30px rgba(80, 60, 20, 0.12);
+            border: 4px solid var(--white);
+            outline: 3px dashed #FFCF8C;
+            outline-offset: -14px;
+            padding: 26px 22px;
             position: relative;
         }
 
         .header-card {
-            background-color: var(--light-bg);
-            border-radius: 15px;
-            padding: 20px;
+            background: linear-gradient(160deg, var(--light-bg) 0%, #FFE9B0 100%);
+            border-radius: 22px;
+            padding: 22px 18px 18px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 26px;
+            position: relative;
+            border: 3px solid #FFE29A;
+        }
+        .header-card::before {
+            content: '⭐';
+            position: absolute;
+            top: -14px;
+            left: 14px;
+            font-size: 22px;
+            transform: rotate(-15deg);
+        }
+        .header-card::after {
+            content: '🎈';
+            position: absolute;
+            top: -18px;
+            right: 16px;
+            font-size: 24px;
+            transform: rotate(12deg);
         }
         .header-card img {
             max-height: 50px;
@@ -49,33 +89,39 @@
             display: inline-block;
         }
         .header-card h1 {
+            font-family: 'ZCOOL KuaiLe', 'Fredoka', '微軟正黑體', sans-serif;
             color: var(--header-green);
-            font-size: 20px;
+            font-size: 23px;
+            letter-spacing: 1px;
             margin: 5px 0 0 0;
         }
         .header-card p {
-            color: var(--header-green);
-            font-size: 16px;
-            margin: 5px 0 15px 0;
-            font-weight: bold;
+            font-family: 'ZCOOL KuaiLe', 'Fredoka', '微軟正黑體', sans-serif;
+            color: var(--coral);
+            font-size: 18px;
+            margin: 6px 0 16px 0;
+            font-weight: normal;
         }
         .timer-box {
-            background-color: #2b2b2b;
+            background-color: #3A3550;
             color: white;
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 16px;
+            padding: 12px 10px;
             font-size: 14px;
-            font-weight: bold;
-            line-height: 1.5;
+            font-weight: 600;
+            line-height: 1.6;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.25);
         }
-        .timer-box .icon { color: #ff4d4d; margin-right: 5px; }
-        .timer-box.active-timer .icon { color: #0d8253; } 
+        .timer-box .icon { margin-right: 5px; display: inline-block; animation: swing 1.6s ease-in-out infinite; }
+        .timer-box.active-timer { background-color: #1D9E63; }
+        .timer-box.active-timer .icon { animation: bounce 1s ease-in-out infinite; }
 
         .progress-bar {
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 30px;
+            padding: 6px 0;
         }
         .step-indicator {
             display: flex;
@@ -83,32 +129,39 @@
             align-items: center;
             font-size: 12px;
             color: var(--text-grey);
-            font-weight: bold;
+            font-weight: 700;
+            width: 68px;
         }
         .step-indicator.active { color: var(--header-green); }
         .step-circle {
-            width: 28px;
-            height: 28px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background-color: var(--white);
-            border: 2px solid #ccc;
+            border: 3px solid #DCE3DC;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 5px;
-            color: #ccc;
+            margin-bottom: 6px;
+            color: #b9bdb9;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            box-shadow: 0 3px 0 #DCE3DC;
+            transition: all 0.25s;
         }
         .step-indicator.active .step-circle {
-            background-color: var(--header-green);
-            border-color: var(--header-green);
+            background: linear-gradient(160deg, var(--sun), var(--coral));
+            border-color: var(--coral);
             color: var(--white);
+            box-shadow: 0 3px 0 #E0563E;
+            transform: translateY(-2px);
         }
         .step-line {
-            width: 40px;
-            height: 2px;
-            background-color: #ccc;
-            margin: 0 10px;
-            transform: translateY(-10px);
+            width: 26px;
+            height: 0;
+            border-top: 3px dashed #DCE3DC;
+            margin: 18px 4px 0;
         }
 
         .step-content { display: none; animation: fadeIn 0.4s ease; }
@@ -124,24 +177,27 @@
         .btn-back {
             position: absolute;
             left: 0;
-            background-color: #f0f4f8;
-            border: 1px solid #d1d9e0;
-            color: #333;
-            padding: 5px 10px;
-            border-radius: 5px;
+            background-color: var(--white);
+            border: 2px solid var(--sky);
+            color: #0d7bb0;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
+            box-shadow: 0 2px 0 #B9E4F7;
         }
+        .btn-back:active { transform: translateY(2px); box-shadow: none; }
         .btn-back::before {
             content: '⬅';
-            color: #0056b3;
             margin-right: 4px;
         }
         .section-title {
-            font-size: 18px;
-            font-weight: bold;
+            font-family: 'ZCOOL KuaiLe', '微軟正黑體', sans-serif;
+            font-size: 19px;
+            font-weight: normal;
             color: var(--text-dark);
             margin: 0;
         }
@@ -149,61 +205,90 @@
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 14px;
         }
         .student-card, .class-btn {
             background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px 10px;
+            border: 3px solid var(--border-color);
+            border-radius: 18px;
+            padding: 16px 10px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            box-shadow: 0 4px 0 var(--border-color);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        .student-card:hover, .class-btn:hover { border-color: var(--primary-green); }
+        .student-card:hover, .class-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-green);
+            box-shadow: 0 6px 0 var(--primary-green);
+        }
+        .student-card:active, .class-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 var(--border-color);
+        }
         .student-card .num {
+            font-family: 'Fredoka', sans-serif;
             font-size: 12px;
             color: var(--text-grey);
             margin-bottom: 5px;
         }
         .student-card .name {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: bold;
             color: var(--text-dark);
         }
         .class-btn {
-            font-size: 18px;
-            font-weight: bold;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            font-size: 19px;
         }
+        .class-btn:nth-child(6n+1) { border-color: #FFCFC7; box-shadow: 0 4px 0 #FFCFC7; }
+        .class-btn:nth-child(6n+1):hover { box-shadow: 0 6px 0 var(--coral); border-color: var(--coral); }
+        .class-btn:nth-child(6n+2) { border-color: #C9EFD6; box-shadow: 0 4px 0 #C9EFD6; }
+        .class-btn:nth-child(6n+2):hover { box-shadow: 0 6px 0 var(--grass); border-color: var(--grass); }
+        .class-btn:nth-child(6n+3) { border-color: #BEE7F7; box-shadow: 0 4px 0 #BEE7F7; }
+        .class-btn:nth-child(6n+3):hover { box-shadow: 0 6px 0 var(--sky); border-color: var(--sky); }
+        .class-btn:nth-child(6n+4) { border-color: #FCE3A8; box-shadow: 0 4px 0 #FCE3A8; }
+        .class-btn:nth-child(6n+4):hover { box-shadow: 0 6px 0 var(--sun); border-color: #E0AC1F; }
+        .class-btn:nth-child(6n+5) { border-color: #E4D2F5; box-shadow: 0 4px 0 #E4D2F5; }
+        .class-btn:nth-child(6n+5):hover { box-shadow: 0 6px 0 var(--grape); border-color: var(--grape); }
 
         .club-card {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
+            border: 3px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
             background-color: var(--card-bg);
             cursor: pointer;
+            box-shadow: 0 4px 0 var(--border-color);
+            transition: transform 0.15s ease;
         }
-        .club-card:hover { border-color: var(--primary-green); }
+        .club-card:hover { transform: translateY(-2px); border-color: var(--primary-green); }
+        .club-card:nth-child(4n+1) { background-color: #FFF3F1; }
+        .club-card:nth-child(4n+2) { background-color: #F1FBF4; }
+        .club-card:nth-child(4n+3) { background-color: #F1F9FE; }
+        .club-card:nth-child(4n+4) { background-color: #FBF6FF; }
 
         .btn-submit {
-            background-color: var(--header-green);
+            background: linear-gradient(160deg, var(--grass), var(--header-green));
             color: var(--white);
             border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 16px;
+            border-radius: 16px;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            font-size: 18px;
             cursor: pointer;
             width: 100%;
             margin-top: 15px;
+            box-shadow: 0 5px 0 #0F7A47;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
+        .btn-submit:active { transform: translateY(4px); box-shadow: 0 1px 0 #0F7A47; }
 
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.45);
+            background-color: rgba(58, 53, 80, 0.55);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -211,16 +296,18 @@
         .modal-overlay.active { display: flex; }
         .modal-card {
             background-color: var(--white);
-            border-radius: 20px;
+            border-radius: 24px;
             width: 90%;
             max-width: 360px;
-            padding: 25px 20px;
+            padding: 26px 22px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 14px 0 rgba(0,0,0,0.08), 0 20px 34px rgba(0,0,0,0.18);
+            border: 4px solid var(--sun);
             animation: popIn 0.3s ease;
         }
         .modal-card h3 {
-            font-size: 20px;
+            font-family: 'ZCOOL KuaiLe', sans-serif;
+            font-size: 22px;
             margin: 0 0 5px 0;
             color: var(--text-dark);
         }
@@ -238,13 +325,14 @@
         .modal-input {
             width: 100%;
             padding: 12px;
-            border: 2px solid var(--primary-green);
-            border-radius: 10px;
+            border: 3px solid var(--primary-green);
+            border-radius: 14px;
             font-size: 20px;
+            font-family: 'Fredoka', sans-serif;
             text-align: center;
-            box-sizing: border-box;
             outline: none;
             margin-bottom: 25px;
+            background-color: #F6FFF9;
         }
         .modal-actions {
             display: flex;
@@ -253,22 +341,29 @@
         .modal-btn {
             flex: 1;
             padding: 12px 0;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 14px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
             border: none;
         }
         .btn-cancel {
             background-color: var(--btn-cancel);
-            color: #4a5568;
+            color: #b3503f;
         }
         .btn-confirm {
-            background-color: var(--primary-green);
+            background: linear-gradient(160deg, var(--grass), var(--header-green));
             color: var(--white);
+            box-shadow: 0 4px 0 #0F7A47;
         }
+        .btn-confirm:active { transform: translateY(3px); box-shadow: none; }
 
-        #loading { text-align: center; color: var(--text-grey); font-weight: bold; margin-bottom: 20px; }
+        #loading {
+            text-align: center;
+            color: var(--text-grey);
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
@@ -278,6 +373,19 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes swing {
+            0%, 100% { transform: rotate(-8deg); }
+            50% { transform: rotate(8deg); }
+        }
+
+        @media (max-width: 380px) {
+            .step-indicator { width: 58px; }
+            .step-line { width: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -286,38 +394,38 @@
     <div class="header-card">
         <img src="logo.png" alt="Logo" onerror="this.style.display='none';">
         <h1>115學年度 第一學期</h1>
-        <p>課後社團 報名系統</p>
+        <p>🎨 課後社團 報名系統 🎈</p>
         
         <div class="timer-box" id="timerBox">
             <span class="icon" id="timerIcon">⏳</span> <span id="timerStatus">載入時間中...</span><br>
-            <span id="timerDisplay" style="font-family: monospace; font-size: 16px;">--天 --時 --分 --秒</span>
+            <span id="timerDisplay" style="font-family: 'Fredoka', monospace; font-size: 16px;">--天 --時 --分 --秒</span>
         </div>
     </div>
 
-    <!-- 進度條 -->
+    <!-- 進度條：像遊戲關卡地圖一樣的步驟指引 -->
     <div class="progress-bar">
         <div class="step-indicator active" id="indicator1">
-            <div class="step-circle">1</div>
+            <div class="step-circle">🏫</div>
             <span>選班級</span>
         </div>
         <div class="step-line"></div>
         <div class="step-indicator" id="indicator2">
-            <div class="step-circle">2</div>
+            <div class="step-circle">🙋</div>
             <span>點名字</span>
         </div>
         <div class="step-line"></div>
         <div class="step-indicator" id="indicator3">
-            <div class="step-circle">3</div>
+            <div class="step-circle">🎒</div>
             <span>排志願</span>
         </div>
     </div>
 
-    <div id="loading">系統資料載入中，請稍候...</div>
+    <div id="loading">🎪 系統資料載入中，請稍候...</div>
 
     <!-- 步驟區塊 -->
     <div id="step1" class="step-content">
         <div class="section-header">
-            <h2 class="section-title">請選擇班級</h2>
+            <h2 class="section-title">🏫 請選擇班級</h2>
         </div>
         <div class="grid-container" id="classList"></div>
     </div>
@@ -333,22 +441,24 @@
     <div id="step3" class="step-content">
         <div class="section-header">
             <button class="btn-back" onclick="showStep(2)">上一頁</button>
-            <h2 class="section-title">請選擇課後社團 (可多選)</h2>
+            <h2 class="section-title">🎒 選社團囉 (可多選)</h2>
         </div>
         <div id="clubList"></div>
-        <button class="btn-submit" onclick="submitForm()">確認送出 (可再次修改)</button>
+        <button class="btn-submit" onclick="submitForm()">🚀 確認送出 (可再次修改)</button>
     </div>
 
     <div id="step-success" class="step-content" style="text-align: center; padding: 30px 0;">
-        <h2 style="color: var(--header-green);">報名資料已送出！</h2>
+        <div style="font-size: 52px; margin-bottom: 6px;">🎉</div>
+        <h2 style="font-family: 'ZCOOL KuaiLe', sans-serif; font-weight: normal; color: var(--header-green);">報名資料已送出！</h2>
         <p style="color: var(--text-grey); margin-bottom: 25px;">若需修改志願，請重新登入並再次送出即可覆蓋舊資料。</p>
-        <button class="btn-submit" onclick="location.reload()">回首頁</button>
+        <button class="btn-submit" onclick="location.reload()">🏠 回首頁</button>
     </div>
 </div>
 
 <!-- 身分驗證彈跳視窗 -->
 <div class="modal-overlay" id="authModal">
     <div class="modal-card">
+        <div style="font-size: 34px; margin-bottom: 4px;">🔑</div>
         <h3>身分驗證</h3>
         <div class="student-badge" id="modalStudentName">101 班 陳士軒</div>
         <div class="desc">請輸入驗證密碼 (password)</div>
