@@ -674,20 +674,24 @@
         });
     }
 
-    function submitForm() {
+function submitForm() {
         if (!isRegistrationOpen) return alert("報名時間已截止！");
 
         const selectedCheckboxes = document.querySelectorAll('input[name="clubChoice"]:checked');
-        if (selectedCheckboxes.length === 0) return alert("請至少選擇一個社團！");
         
         // ============================================
-        // 同一星期防呆檢查：阻止報名衝突的時段
+        // 允許取消全部社團：如果有 0 個被選中，跳出確認視窗
         // ============================================
+        if (selectedCheckboxes.length === 0) {
+            const confirmCancel = confirm("您目前沒有勾選任何社團，這將會【清除】您之前所有的報名紀錄。\n\n確定要取消所有報名嗎？");
+            if (!confirmCancel) return; // 按下取消就不送出
+        }
+        
         const selectedDays = [];
         const selectedClubsArray = [];
         
         for (let cb of selectedCheckboxes) {
-            const day = cb.getAttribute('data-day'); // 取出星期幾
+            const day = cb.getAttribute('data-day'); 
             if (selectedDays.includes(day)) {
                 return alert(`⚠️ 發生時段衝突！\n您重複選擇了「星期${day}」的社團，每天只能報名一個。`);
             }
@@ -700,7 +704,7 @@
             num: currentStudent.num,
             name: currentStudent.name,
             pwd: verifiedPassword,
-            selectedClubs: selectedClubsArray
+            selectedClubs: selectedClubsArray // 如果沒選，這裡就是空陣列 []
         };
 
         document.getElementById('step3').innerHTML = '<h2 style="text-align:center; color:var(--text-grey);">資料處理中，請稍候...</h2>';
